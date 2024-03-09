@@ -4,16 +4,21 @@
 #include "modules/sensor/DHTSensor.h"
 #include "modules/server/ServerModule.h"
 #include "modules/wifi/WifiModule.h"
-
-const uint8_t DHT_PIN = D4;
+#include "modules/display/DisplayModule.h"
 
 JSONVar json;
 ServerModule server;
+
+const uint8_t DHT_PIN = D4;
 DHTSensor dhtSensor(DHT_PIN, 2000);
 
 const char *ssid = "";
 const char *password = "";
 WifiModule wifi(ssid, password);
+
+const uint8_t SDA_PIN = D1;
+const uint8_t SCL_PIN = D2;
+DisplayModule display(SDA_PIN, SCL_PIN);
 
 void setup()
 {
@@ -27,6 +32,7 @@ void setup()
   wifi.init();
   server.init();
   dhtSensor.init();
+  display.init();
 }
 
 void loop()
@@ -36,8 +42,14 @@ void loop()
   dhtSensor.printData();
 
   auto data = dhtSensor.getData();
-  json["humidity"] = String(data.humidity);
-  json["temperature"] = String(data.temperature);
+
+  String humidity = String(data.humidity);
+  String temperature = String(data.temperature);
+
+  json["humidity"] = humidity;
+  json["temperature"] = temperature;
 
   server.notifyAll(JSON.stringify(json));
+
+  display.draw(humidity, temperature);
 }
