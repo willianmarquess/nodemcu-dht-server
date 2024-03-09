@@ -22,13 +22,14 @@ DisplayModule display(SDA_PIN, SCL_PIN);
 
 void setup()
 {
+  Serial.begin(115200);
+
   if (!LittleFS.begin())
   {
     Serial.println("An error has occurred while mounting LittleFS");
     return;
   }
 
-  Serial.begin(115200);
   wifi.init();
   server.init();
   dhtSensor.init();
